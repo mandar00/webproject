@@ -1,0 +1,16 @@
+on register.hbs in form  action ="/register" , method ="POST" (ie when submit btn in pressed then send the data of /register by POST method)
+submit btn value register
+set the name attribute for each i\p box
+and acesse the data inside the input feild by its name as req.body.firstname here boy is the body of reg page
+
+even if unique is not defined email and no cannot be same whitle name can be same
+
+
+git 
+1] git status 
+2]git init 
+3]git status //gives all the files
+4]in root dir create .gitignore
+5] add the files to ignore ie node_modules .env
+6]git status //.gitignore replaces node_modules and .env file
+7]git add .// add all the files 
