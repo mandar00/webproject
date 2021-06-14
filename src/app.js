@@ -5,6 +5,8 @@ const path = require('path');
 const hbs = require('hbs');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const auth = require('./middleware/auth');
 const Register = require('./models/registers');//this register will tell what should the data belike 
 // const  hbs  = require('hbs');
 const port =process.env.PORT ||3000
@@ -25,9 +27,30 @@ hbs.registerPartials(partials_path)//the partiaals included in the index.hbs are
 app.use(express.json())//the in comming data is gonna be json data
 app.use(express.urlencoded({extended:false}))
 
-console.log(process.env.SECRET_KEY)
+app.use(cookieParser())
+console.log(`this is secrret key ${process.env.SECRET_KEY}`)
 app.get("/",(req,res)=>{
     res.render("index")
+})
+
+app.get("/secret",auth,(req,res)=>{
+    console.log(` this is the jwt token ${req.cookies.jwt}`)//if any one goes to the secret page then console.log() the data of  cokkie jwt
+    res.render("secret")
+})
+
+app.get("/logout",auth, async(req,res)=>{
+    try {
+        req.user.tokens=req.user.tokens.filter((ele)=>{
+            return ele.token != req.token
+        })//this is to remove the user from the device it is signed in  
+        //to remove him from all the devices
+        req.user.tokens=[]
+        res.clearCookie("jwt")
+        res.status(201).send("logeed out sucessfully")
+        await req.user.save()
+    } catch (error) {
+        res.status(500).send(error)
+    }
 })
 
 app.get("/register",(req,res)=>{
@@ -36,7 +59,7 @@ app.get("/register",(req,res)=>{
 
 
 app.post("/register",async(req,res)=>{
-    try {
+    try { 
         console.log(req.body.firstname) //firstname is the name of input textbox
         console.log(req.body.password) //firstname is the name of input textbox
         console.log(req.body.email)
@@ -47,10 +70,14 @@ app.post("/register",async(req,res)=>{
             email:req.body.email,
             phoneno:req.body.phoneno
         })
-
+        
         const token=await registeremployee.genrateAuthToken()
-        console.log(token)
-
+        console.log(`this is token ${token}`)
+        res.cookie("jwt",token,{
+            expires:new Date(Date.now()),
+            httpOnly:true
+        })
+        
         const saveemployee= await registeremployee.save();
         res.status(201).render( 'index')
     } catch (error) {
@@ -74,8 +101,15 @@ app.post("/login", async(req,res)=>{
         console.log(useremail)
         const ismatch= await  bcrypt.compare(password,useremail.password)
         console.log(ismatch)
+
+
         const token=await useremail.genrateAuthToken()
         console.log(token)//create a token every time i log in and store it in an array 
+        res.cookie("jwt",token,{
+            expires:new Date(Date.now() + 300000),
+            httpOnly:true
+        })
+
 
         if(ismatch){
             res.status(201).render("index")
@@ -101,3 +135,5 @@ app.post("/login", async(req,res)=>{
 app.listen(port ,()=>{
     console.log(`server is running at ${port}`)
 })
+
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGM1ZGNhZGFmZWVhYzU1NWMwMDZjMWEiLCJpYXQiOjE2MjM2NzIzODZ9.G8x6xW65_3lo6SPQA5Q4Y4BiDR3BPVsLDrXxm06nQaQ

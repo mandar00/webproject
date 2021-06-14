@@ -14,3 +14,30 @@ git
 5] add the files to ignore ie node_modules .env
 6]git status //.gitignore replaces node_modules and .env file
 7]git add .// add all the files 
+8] git commit -m "any msg"
+9] create a new repo in github and add
+10]git remote add origin https://github.com/mandar00/webproject.git //the remote file 
+11]ssh -T git@github.com//type yes
+12] git push -u origin master
+
+to add the changes once itis uploaded 
+git status
+git add .
+git status
+git commit -m "specify whats changed "
+git push
+
+
+how to ad a new file to git repos
+git status 
+git init 
+git status
+create .gitignore
+add files to in     
+git add .
+git commit -m "msg"
+crreate a repo
+copy the git remote add origin and paste in the terminal
+git branch
+git  push -u origin master
+the folder is added 
